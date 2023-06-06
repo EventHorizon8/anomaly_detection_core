@@ -27,7 +27,7 @@ class LoginController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
-            response()->json(['error' => 'Access denied'], 400);
+            return response()->json(['message' => 'Access denied'], 403);
         }
 
         return response()->json(['token' => $user->createToken($request->device_name)->plainTextToken], 200);
