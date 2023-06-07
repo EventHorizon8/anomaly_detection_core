@@ -18,6 +18,11 @@ Route::middleware('auth:sanctum')->get('/account', function (Request $request) {
     return $request->user();
 })->name('account');
 
+Route::middleware('auth:sanctum')->delete(
+    '/authorise',
+    [\App\Http\Controllers\LogoutController::class, 'logoutUser'],
+)->name('logout');
+
 
 Route::post(
     '/authorise',
