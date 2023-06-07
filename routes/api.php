@@ -23,3 +23,9 @@ Route::post(
     '/authorise',
     [\App\Http\Controllers\LoginController::class, 'authoriseUser'],
 )->name('authorise');
+
+Route::group(['middleware' => 'auth:sanctum'], function() {
+    Route::apiResources([
+        'clients' => \App\Http\Controllers\ClientController::class,
+    ]);
+});
