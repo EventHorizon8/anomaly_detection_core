@@ -1,4 +1,4 @@
-# anomaly_detection_core
+# Anomaly detection core
 There is an anomaly detection core
 
 
