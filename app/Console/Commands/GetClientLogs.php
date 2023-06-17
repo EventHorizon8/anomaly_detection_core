@@ -42,6 +42,7 @@ class GetClientLogs extends Command
                 ]);
                 if ($response->successful()) {
                     $client->last_communication_at = now();
+                    $client->save(['last_communication_at']);
                     $logs = $response->json('logs') ?? [];
                     if ($logs) {
                         foreach ($logs as $log) {
