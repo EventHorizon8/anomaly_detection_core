@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE `aws_system_logs` MODIFY `timestamp` TIMESTAMP(3)");
+        DB::statement("ALTER TABLE `aws_system_logs` MODIFY `timestamp` TIMESTAMP(6)");
     }
 
     /**
