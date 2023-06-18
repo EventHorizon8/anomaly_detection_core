@@ -45,7 +45,7 @@ class AwsSystemLog extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'timestamp' => 'datetime',
+        'timestamp' => 'datetime:Y-m-d\TH:i:s.v\Z',
     ];
 
     public function client(): BelongsTo

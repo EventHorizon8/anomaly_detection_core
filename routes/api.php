@@ -33,4 +33,12 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
     Route::apiResources([
         'clients' => \App\Http\Controllers\ClientController::class,
     ]);
+    Route::get(
+        '/clients/{id}/dashboard',
+        [\App\Http\Controllers\ClientController::class, 'dashboard'],
+    );
+    Route::get(
+        '/clients/{id}/dashboard/detailed',
+        [\App\Http\Controllers\ClientController::class, 'dashboardDetailed'],
+    );
 });
