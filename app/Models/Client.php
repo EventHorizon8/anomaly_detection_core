@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\ShopProduct\Models\ShopProductPrice;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Client extends Model
@@ -44,5 +44,23 @@ class Client extends Model
                 'client_id',
                 'id'
             )->orderBy('timestamp', 'desc');
+    }
+
+    public function systemLogs(): HasMany
+    {
+        return $this->hasMany(
+            AwsSystemLog::class,
+            'client_id',
+            'id'
+        )->orderBy('timestamp', 'desc');
+    }
+
+    public function clientStats(): HasMany
+    {
+        return $this->hasMany(
+            ClientStats::class,
+            'client_id',
+            'id'
+        )->orderBy('created_at', 'desc');
     }
 }
