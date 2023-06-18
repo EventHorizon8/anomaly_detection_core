@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,7 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-         \App\Models\Client::factory(10)->create();
+         $clients = \App\Models\Client::factory(5)->create();
+         foreach ($clients as $client) {
+             \App\Models\AwsSystemLog::factory(10)->create();
+             \App\Models\ClientStats::factory(20)->create();
+         }
+
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
