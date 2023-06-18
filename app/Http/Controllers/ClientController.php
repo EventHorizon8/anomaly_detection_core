@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\AwsSystemLog;
 use App\Models\Client;
 use App\Models\ClientStats;
 use Illuminate\Http\JsonResponse;
@@ -123,6 +124,40 @@ class ClientController extends Controller
         return response()->json([
             'statList' => $clientStats,
             'anomalyList' => $preparedAnomalyLogs,
+        ]);
+    }
+
+    public function dashboardDetailed(Request $request, string $id): JsonResponse
+    {
+        $periodOnDashboard = $request->validate([
+            //max - 1 year
+            'period_seconds' => ['required', 'integer', 'min:1', 'max:31536000'],
+        ]);
+        /**
+         * @param $client Client
+         */
+        $client = Client::find($id);
+        if ($client === null) {
+            return response()->json(['message' => 'Client not found'], 404);
+        }
+
+        //load last stat
+        $lastLog = $client->lastLog;
+        if ($lastLog === null) {
+            return response()->json(['message' => 'Logs not found'], 404);
+        }
+        $fromDatetime = $lastLog->timestamp;
+        $fromDatetime->subtract($periodOnDashboard['period_seconds'], 'seconds');
+        $clientLogs = $client->systemLogs()
+            ->where('timestamp', '>', $fromDatetime)
+            ->get()
+            ?->map(function (AwsSystemLog $logs) {
+                return collect($logs->toArray())->keyBy(function ($value, $key) {
+                    return Str::camel($key);
+                });
+            })->toArray();
+        return response()->json([
+            'logs' => $clientLogs,
         ]);
     }
 }

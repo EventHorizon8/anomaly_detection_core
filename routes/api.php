@@ -38,7 +38,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
         [\App\Http\Controllers\ClientController::class, 'dashboard'],
     );
     Route::get(
-        '/clients/{id}/dashboard',
-        [\App\Http\Controllers\ClientController::class, 'dashboard'],
+        '/clients/{id}/dashboard/detailed',
+        [\App\Http\Controllers\ClientController::class, 'dashboardDetailed'],
     );
 });
