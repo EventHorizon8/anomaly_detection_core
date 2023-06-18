@@ -40,10 +40,32 @@ class GetClientLogs extends Command
                     'last_ts' => $client->lastLog?->timestamp?->getTimestamp() ?? 0,
                     'last_hash' => $client->lastLog?->hash ?? '',
                 ]);
+                $logs = [
+                    [
+                        "timestamp"=> 129.050634,
+        "processId"=> 382,
+        "threadId"=> 382,
+        "parentProcessId"=> 1,
+        "userId"=> 101,
+        "mountNamespace"=> 4026532232,
+        "processName"=> "systemd-resolve",
+        "hostName"=> "ip-10-100-1-217",
+        "eventId"=> 41,
+        "eventName"=> "socket",
+        "stackAddresses"=> [
+                    140159195621643,
+                    140159192455417,
+                    94656731598592
+                ],
+        "argsNum"=> 3,
+        "returnValue"=> 15,
+        "args"=> "[{'name': 'domain', 'type': 'int', 'value': 'AF_UNIX'}, {'name': 'type', 'type': 'int', 'value': 'SOCK_DGRAM|SOCK_CLOEXEC'}, {'name': 'protocol', 'type': 'int', 'value': 0}]",
+                    ]
+                ];
                 if ($response->successful()) {
                     $client->last_communication_at = now();
                     $client->save(['last_communication_at']);
-                    $logs = $response->json('logs') ?? [];
+                    //$logs = $response->json('logs') ?? [];
                     if ($logs) {
                         foreach ($logs as $log) {
                             AwsSystemLog::create([
