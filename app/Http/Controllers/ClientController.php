@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 
 class ClientController extends Controller
 {
+    private const LIMIT = 1000;
     /**
      * Display a listing of the resource.
      */
@@ -116,6 +117,7 @@ class ClientController extends Controller
             ->select('timestamp')
             ->where('anomaly_detected', '=', 1)
             ->where('timestamp', '>', $fromDatetime)
+            ->orderBy('timestamp', 'desc')
             ->get();
         $preparedAnomalyLogs = [];
         foreach ($clientLogs as $key => $log) {
@@ -129,9 +131,10 @@ class ClientController extends Controller
 
     public function dashboardDetailed(Request $request, string $id): JsonResponse
     {
-        $periodOnDashboard = $request->validate([
-            //max - 1 year
-            'period_seconds' => ['required', 'integer', 'min:1', 'max:31536000'],
+        $requestFilters = $request->validate([
+            'timestamp_mk_s' => ['prohibits:from_id,to_id', 'filled', 'numeric', 'between:0,31536001.000000'],
+            'from_id' => ['prohibits:timestamp_mk_s,to_id','filled','integer', 'exists:aws_system_logs,id'],
+            'to_id' => ['prohibits:timestamp_mk_s,from_id','filled', 'integer', 'exists:aws_system_logs,id'],
         ]);
         /**
          * @param $client Client
@@ -141,23 +144,29 @@ class ClientController extends Controller
             return response()->json(['message' => 'Client not found'], 404);
         }
 
-        //load last stat
-        $lastLog = $client->lastLog;
-        if ($lastLog === null) {
-            return response()->json(['message' => 'Logs not found'], 404);
+        $timestampMkS = $requestFilters['timestamp_mk_s'] ?? null;
+        $fromId = $requestFilters['from_id'] ?? null;
+        $toId = $requestFilters['to_id'] ?? null;
+
+        $clientLogs = $client->systemLogs();
+        if ($timestampMkS !== null) {
+            $clientLogs->where('timestamp', '>=', $timestampMkS);
+        } elseif ($fromId !== null) {
+            $clientLogs->where('id', '>', $fromId);
+        } elseif($toId !== null) {
+            $clientLogs->where('id', '<', $toId);
         }
-        $fromDatetime = $lastLog->timestamp;
-        $fromDatetime->subtract($periodOnDashboard['period_seconds'], 'seconds');
-        $clientLogs = $client->systemLogs()
-            ->where('timestamp', '>', $fromDatetime)
-            ->get()
-            ?->map(function (AwsSystemLog $logs) {
-                return collect($logs->toArray())->keyBy(function ($value, $key) {
-                    return Str::camel($key);
-                });
-            })->toArray();
+        $clientLogs->limit(self::LIMIT)
+        ->orderBy('id', 'ASC');
+
+        $clientLogsResult = $clientLogs->get()
+        ?->map(function (AwsSystemLog $logs) {
+            return collect($logs->toArray())->keyBy(function ($value, $key) {
+                return Str::camel($key);
+            });
+        })->toArray();
         return response()->json([
-            'logs' => $clientLogs,
+            'logs' => $clientLogsResult,
         ]);
     }
 }
