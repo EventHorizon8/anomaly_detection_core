@@ -52,7 +52,7 @@ class Client extends Model
             AwsSystemLog::class,
             'client_id',
             'id'
-        )->orderBy('timestamp', 'desc');
+        );
     }
 
     public function clientStats(): HasMany
