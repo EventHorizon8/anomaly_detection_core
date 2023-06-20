@@ -70,7 +70,7 @@ class GetClientLogs extends Command
                     $logType = $response->json('logsType');
                     $stats = $response->json('stats');
                     if ($stats) {
-                        ClientStats::create(collect($stats)->keyBy(function ($value, $key) {
+                        ClientStats::create(collect($stats + ['client_id' => $client->id])->keyBy(function ($value, $key) {
                             return Str::snake($key);
                         })->toArray());
                     }
