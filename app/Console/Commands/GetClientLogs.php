@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Models\AwsSystemLog;
 use App\Models\Client;
 use App\Models\ClientStats;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -48,7 +49,7 @@ class GetClientLogs extends Command
                         foreach ($logs as $log) {
                             AwsSystemLog::create([
                                 'client_id' => $client->id,
-                                'timestamp' => $log['timestamp'] ?? 0,
+                                'timestamp' => Carbon::createFromTimestamp($log['timestamp'] ?? 0)->format('Y-m-d H:i:s.u'),
                                 'process_id' => $log['processId'] ?? 0,
                                 'thread_id' => $log['threadId'] ?? 0,
                                 'parent_process_id' => $log['parentProcessId'] ?? 0,
