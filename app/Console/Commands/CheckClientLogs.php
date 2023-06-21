@@ -31,23 +31,23 @@ class CheckClientLogs extends Command
     public function handle(): void
     {
         $logs = AwsSystemLog::query()->select([
-            'id',
-            'client_id',
-            'timestamp',
-            'process_id',
-            'thread_id',
-            'parent_process_id',
-            'user_id',
-            'mount_namespace',
-            'process_name',
-            'host_name',
-            'event_id',
-            'event_name',
-            'stack_address',
-            'args_num',
-            'return_value',
-            'args',
-            'hash']
+                'id',
+                'client_id',
+                'timestamp',
+                'process_id',
+                'thread_id',
+                'parent_process_id',
+                'user_id',
+                'mount_namespace',
+                'process_name',
+                'host_name',
+                'event_id',
+                'event_name',
+                'stack_address',
+                'args_num',
+                'return_value',
+                'args',
+                'hash']
         )->whereNull('anomaly_detected')->get()->map(
             function (AwsSystemLog $log) {
                 return collect($log->toArray())->keyBy(function ($value, $key) {
@@ -71,7 +71,7 @@ class CheckClientLogs extends Command
 
         if ($response->successful()) {
             foreach ($response->json('logs') as $log) {
-                if ($log['id'] && $log['outlierAnomalyScore'] && $log['anomalyDetected']) {
+                if (isset($log['id'], $log['outlierAnomalyScore'], $log['anomalyDetected'])) {
                     AwsSystemLog::find($log['id'])->update([
                         'outlier_anomaly_score' => $log['outlierAnomalyScore'],
                         'anomaly_detected' => $log['anomalyDetected'],
